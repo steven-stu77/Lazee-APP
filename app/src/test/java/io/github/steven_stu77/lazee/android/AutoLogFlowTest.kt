@@ -40,6 +40,7 @@ class AutoLogFlowTest {
     @Inject lateinit var settings: SettingsRepository
     @Inject lateinit var processor: AutoLogProcessor
     @Inject lateinit var repo: AutoLogRepository
+    @Inject lateinit var bills: io.github.steven_stu77.lazee.core.repo.BillRepository
 
     private val tng = "my.com.tngdigital.ewallet"
     private val mae = "com.maybank2u.life"
@@ -114,5 +115,17 @@ class AutoLogFlowTest {
         assertThat(p.possibleDuplicateOf).isEqualTo(manual)
         assertThat(p.last4).isEqualTo("1234")
         assertThat(p.status).isEqualTo(PendingStatus.PENDING)
+    }
+
+    @Test fun manuallyPaidBillThenNotificationIsPossibleDuplicate() = runBlocking {
+        settings.setAutoFamiliar(true)
+        val today = LocalDate.now()
+        val billId = db.bills().insert(Bill(name = "Unifi", amount = 12_900, dayOfMonth = today.dayOfMonth, categoryId = ledger.categoryByKey("bills")!!.id, startMonth = BillMath.ym(YearMonth.from(today))))
+        bills.markPaid(billId)
+        processor.process(mae, "Payment of RM129.00 to UNIFI is successful.", now)
+        val p = pendingItems().single()
+        assertThat(p.matchedBillId).isNull() // already paid this month
+        assertThat(p.possibleDuplicateOf).isNotNull()
+        assertThat(ledger.allTransactions()).hasSize(1) // only the manual one
     }
 }

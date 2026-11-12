@@ -100,6 +100,8 @@ class ScreenshotTest {
             tapTab("我的"); shot("03-me")
             tap("通知自动记账"); waitFor("记到："); shot("11-autolog")
             compose.onAllNodesWithContentDescription("返回")[0].performClick(); compose.waitForIdle()
+            tap("账单提醒"); waitFor("Unifi"); shot("12-bills")
+            compose.onAllNodesWithContentDescription("返回")[0].performClick(); compose.waitForIdle()
             tap("分类管理"); shot("04-categories")
             tap("+ 新增分类"); shot("05-new-category")
         }

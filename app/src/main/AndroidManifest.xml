@@ -52,6 +52,18 @@
             android:name=".feature.autolog.pending.PendingActionReceiver"
             android:exported="false" />
 
+        <receiver
+            android:name=".work.BillActionReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".work.BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Lets AppCompat remember the in-app language on Android 12 and below. -->
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
