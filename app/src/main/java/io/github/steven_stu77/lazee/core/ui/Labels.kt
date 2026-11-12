@@ -30,10 +30,13 @@ object Labels {
 
     fun isZh(context: Context): Boolean = context.resources.configuration.locales[0].language == "zh"
 
-    /** "11 月 12 日 · 星期四" or "12 Nov · Thu". */
-    fun dayFull(context: Context, d: LocalDate): String =
-        if (isZh(context)) "${d.monthValue} 月 ${d.dayOfMonth} 日 · ${d.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.CHINESE)}"
-        else "${d.dayOfMonth} ${d.month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)} · ${d.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)}"
+    private fun en(m: java.time.Month, style: TextStyle) = m.getDisplayName(style, Locale.ENGLISH)
+
+    /** "11 月 12 日 · 星期四" or "12 Nov · Thu" (patterns live in strings.xml). */
+    fun dayFull(context: Context, d: LocalDate): String = context.getString(
+        R.string.fmt_day_full, d.monthValue, d.dayOfMonth, en(d.month, TextStyle.SHORT),
+        d.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH), d.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.CHINESE),
+    )
 
     /** "今天 / 昨天 / 11 月 10 日" for list group headers. */
     fun dayGroup(context: Context, d: LocalDate, today: LocalDate = LocalDate.now()): String = when (d) {
@@ -43,19 +46,17 @@ object Labels {
     }
 
     fun shortDate(context: Context, d: LocalDate): String =
-        if (isZh(context)) "${d.monthValue} 月 ${d.dayOfMonth} 日"
-        else "${d.dayOfMonth} ${d.month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)}"
+        context.getString(R.string.fmt_day_short, d.monthValue, d.dayOfMonth, en(d.month, TextStyle.SHORT))
 
     fun isoDate(d: LocalDate): String = d.format(DateTimeFormatter.ISO_LOCAL_DATE)
 
     /** "2026 年 11 月" / "November 2026". */
     fun monthTitle(context: Context, ym: YearMonth): String =
-        if (isZh(context)) "${ym.year} 年 ${ym.monthValue} 月"
-        else "${ym.month.getDisplayName(TextStyle.FULL, Locale.ENGLISH)} ${ym.year}"
+        context.getString(R.string.fmt_month_title, ym.year, ym.monthValue, en(ym.month, TextStyle.FULL))
 
     /** Short month: "11月" / "Nov". */
     fun monthShort(context: Context, ym: YearMonth): String =
-        if (isZh(context)) "${ym.monthValue}月" else ym.month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+        context.getString(R.string.fmt_month_short, ym.monthValue, en(ym.month, TextStyle.SHORT))
 
     /** Row title: note, else merchant, else category name. */
     fun txnTitle(context: Context, t: Transaction, category: Category?): String =

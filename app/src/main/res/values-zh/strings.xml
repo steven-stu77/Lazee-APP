@@ -18,7 +18,6 @@
     <string name="ok">好</string>
     <string name="skip">跳过</string>
     <string name="next">下一步</string>
-    <string name="done">完成</string>
     <string name="cat_food">餐饮</string>
     <string name="cat_transport">交通</string>
     <string name="cat_shopping">购物</string>
@@ -441,4 +440,19 @@
     <string name="lock_hint">已锁定，保护你的隐私</string>
     <string name="lock_unlock">解锁懒记</string>
     <string name="lock_no_screen_lock">请先在手机设置里设一个屏幕锁（指纹或 PIN）。</string>
+    <string name="look_language">语言</string>
+    <string name="look_theme">主题颜色</string>
+    <string name="about_version">版本 %1$s（构建 %2$d）</string>
+    <string name="about_privacy">隐私说明</string>
+    <string name="about_p_reads">读什么：只读你在「通知自动记账」里勾选的 App 的付款通知。验证码通知最先被丢弃，通知原文从不保存。</string>
+    <string name="about_p_stores">存什么：你的记录、账户、预算和设置，以及通知里的金额、商家、时间、来源 App 和卡号末 4 位。全部存在这台手机上的加密资料库里。</string>
+    <string name="about_p_offline">不上网：App 没有网络权限，没有广告、统计或崩溃上报，什么都传不出去。</string>
+    <string name="about_p_backup">备份用你的密码加密，只存到你选的位置。Android 系统自带的云备份对懒记是关闭的。</string>
+    <string name="about_p_off">怎么关闭：在懒记里关掉「通知自动记账」，或在系统 设置 → 通知 → 通知使用权 里移除懒记。卸载 App 会删除手机上的所有资料。</string>
+    <string name="about_licenses">开源库许可</string>
+    <string name="fmt_day_full">%1$d 月 %2$d 日 · %5$s</string>
+    <string name="fmt_day_short">%1$d 月 %2$d 日</string>
+    <string name="fmt_month_title">%1$d 年 %2$d 月</string>
+    <string name="fmt_month_short">%1$d月</string>
+    <string name="fmt_month_unit">月</string>
 </resources>

@@ -125,7 +125,7 @@ private fun Header(s: HomeUiState, onSearch: () -> Unit, onToggleHide: () -> Uni
             Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 val zh = Labels.isZh(ctx)
                 Text(if (zh) ym.monthValue.toString() else Labels.monthShort(ctx, ym), style = Type.bigMonth)
-                if (zh) Text("月", style = Type.section.copy(fontSize = 16.sp), modifier = Modifier.padding(bottom = 6.dp))
+                if (zh) Text(stringResource(R.string.fmt_month_unit), style = Type.section.copy(fontSize = 16.sp), modifier = Modifier.padding(bottom = 6.dp))
                 Box(Modifier.padding(bottom = 12.dp).size(4.dp).clip(CircleShape).background(p.accent))
                 Text(ym.year.toString(), style = Type.small, modifier = Modifier.padding(bottom = 6.dp))
             }

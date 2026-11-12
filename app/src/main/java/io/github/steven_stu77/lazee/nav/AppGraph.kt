@@ -1,12 +1,6 @@
 package io.github.steven_stu77.lazee.nav
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -23,6 +17,8 @@ import io.github.steven_stu77.lazee.feature.backup.BackupScreen
 import io.github.steven_stu77.lazee.feature.bills.BillsScreen
 import io.github.steven_stu77.lazee.feature.loans.LoansScreen
 import io.github.steven_stu77.lazee.feature.settings.RemindersScreen
+import io.github.steven_stu77.lazee.feature.settings.LookScreen
+import io.github.steven_stu77.lazee.feature.settings.AboutScreen
 import io.github.steven_stu77.lazee.feature.autolog.pending.PendingScreen
 import io.github.steven_stu77.lazee.feature.autolog.settings.AutoLogSettingsScreen
 import io.github.steven_stu77.lazee.feature.autolog.settings.ParserTestScreen
@@ -136,8 +132,6 @@ fun NavGraphBuilder.appGraph(nav: NavHostController) {
 
     composable(Routes.BACKUP) { BackupScreen(onBack = back) }
 
-    listOf(Routes.LOOK, Routes.ABOUT).forEach { r -> composable(r) { Placeholder(r) } }
+    composable(Routes.LOOK) { LookScreen(onBack = back) }
+    composable(Routes.ABOUT) { AboutScreen(onBack = back) }
 }
-
-@Composable
-private fun Placeholder(r: String) = Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(r) }
