@@ -1,10 +1,8 @@
-name: Android CI
+name: probe-full
 
 on:
   push:
-    branches: [main]
-  pull_request:
-  workflow_dispatch:
+    branches: [ci-probe]
 
 permissions:
   contents: write
