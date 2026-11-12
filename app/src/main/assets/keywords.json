@@ -1,0 +1,6 @@
+{
+  "food": ["RESTORAN", "RESTAURANT", "KOPITIAM", "CAFE", "KEDAI MAKAN", "NASI", "MEE", "BAKERY"],
+  "transport": ["PARKING", "TOLL", "PETROL"],
+  "study": ["PRINTING", "KEDAI BUKU", "BOOKSTORE", "STATIONERY"],
+  "other": ["CLINIC", "KLINIK", "FARMASI", "PHARMACY"]
+}

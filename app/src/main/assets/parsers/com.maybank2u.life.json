@@ -1,0 +1,14 @@
+{
+  "package": "com.maybank2u.life",
+  "displayName": "MAE",
+  "preview": true,
+  "rules": [
+    { "direction": "IGNORE", "pattern": "(?i)\\b(promo|offer|login|logged in)\\b" },
+    { "direction": "OWN_TRANSFER", "incoming": false, "pattern": "(?i)(?:transfer|reload)(?:red)? of (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2}) to (?:your )?(?:TNG|Touch ?'?n ?Go|own account|savings)" },
+    { "direction": "PERSON_TRANSFER", "pattern": "(?i)DuitNow transfer of (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2}) to (?<merchant>.+?) (?:is|was) successful" },
+    { "direction": "REFUND", "pattern": "(?i)refund of (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2}) from (?<merchant>.+?)\\.?$" },
+    { "direction": "IN", "pattern": "(?i)(?:received|credited with) (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2}) from (?<merchant>.+?)\\.?$" },
+    { "direction": "OUT", "pattern": "(?i)card(?: ending)? (?:\\*+)?(?<last4>\\d{4})? ?(?:was )?(?:used|charged) (?:for )?(?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2}) at (?<merchant>.+?)\\.?$" },
+    { "direction": "OUT", "pattern": "(?i)payment of (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2}) to (?<merchant>.+?) (?:is|was) successful" }
+  ]
+}

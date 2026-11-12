@@ -1,0 +1,13 @@
+{
+  "package": "my.com.tngdigital.ewallet",
+  "displayName": "TNG eWallet",
+  "preview": true,
+  "rules": [
+    { "direction": "IGNORE", "pattern": "(?i)\\b(reward|promo|voucher|cashback offer|win)\\b" },
+    { "direction": "OWN_TRANSFER", "incoming": true, "pattern": "(?i)(?:reload|top[- ]?up)(?: of)? (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2})" },
+    { "direction": "REFUND", "pattern": "(?i)refund(?:ed)?(?: of)? (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2})(?: (?:from|by) (?<merchant>.+?))?(?: has been credited| is credited| credited)?\\.?$" },
+    { "direction": "PERSON_TRANSFER", "pattern": "(?i)(?:transferred|sent) (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2}) to (?<merchant>.+?)\\.?$" },
+    { "direction": "IN", "pattern": "(?i)received (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2}) from (?<merchant>.+?)\\.?$" },
+    { "direction": "OUT", "pattern": "(?i)paid (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2}) (?:to|at) (?<merchant>.+?)\\.?$" }
+  ]
+}

@@ -93,9 +93,13 @@ class ScreenshotTest {
         launch().use {
             waitFor("茶餐室 早餐")
             shot("02-home")
+            tap("1 笔来自通知的账单待确认"); waitFor("ZUS Coffee"); shot("10-pending")
+            compose.onAllNodesWithContentDescription("返回")[0].performClick(); compose.waitForIdle()
             tapTab("统计"); shot("08-stats")
             tapTab("预算"); shot("09-budget")
             tapTab("我的"); shot("03-me")
+            tap("通知自动记账"); waitFor("记到："); shot("11-autolog")
+            compose.onAllNodesWithContentDescription("返回")[0].performClick(); compose.waitForIdle()
             tap("分类管理"); shot("04-categories")
             tap("+ 新增分类"); shot("05-new-category")
         }

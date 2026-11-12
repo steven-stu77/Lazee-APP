@@ -18,6 +18,9 @@ import io.github.steven_stu77.lazee.feature.accounts.AccountDetailScreen
 import io.github.steven_stu77.lazee.feature.accounts.AccountEditScreen
 import io.github.steven_stu77.lazee.feature.add.AddScreen
 import io.github.steven_stu77.lazee.feature.categories.CategoriesScreen
+import io.github.steven_stu77.lazee.feature.autolog.pending.PendingScreen
+import io.github.steven_stu77.lazee.feature.autolog.settings.AutoLogSettingsScreen
+import io.github.steven_stu77.lazee.feature.autolog.settings.ParserTestScreen
 import io.github.steven_stu77.lazee.feature.categories.NewCategoryScreen
 import io.github.steven_stu77.lazee.feature.home.HomeScreen
 import io.github.steven_stu77.lazee.feature.me.MeScreen
@@ -105,7 +108,11 @@ fun NavGraphBuilder.appGraph(nav: NavHostController) {
     }
     composable(Routes.YEAR, arguments = listOf(intArg("year"))) { YearScreen(onBack = back) }
 
-    listOf(Routes.PENDING, Routes.BILLS, Routes.AUTOLOG, Routes.LOANS, Routes.BACKUP, Routes.LOOK, Routes.REMINDERS, Routes.ABOUT, Routes.PARSER_TEST)
+    composable(Routes.PENDING) { PendingScreen(onBack = back) }
+    composable(Routes.AUTOLOG) { AutoLogSettingsScreen(onBack = back, onParserTest = { nav.navigate(Routes.PARSER_TEST) }) }
+    composable(Routes.PARSER_TEST) { ParserTestScreen(onBack = back) }
+
+    listOf(Routes.BILLS, Routes.LOANS, Routes.BACKUP, Routes.LOOK, Routes.REMINDERS, Routes.ABOUT)
         .forEach { r -> composable(r) { Placeholder(r) } }
     composable(Routes.BILL_EDIT, arguments = listOf(longArg("id"))) { Placeholder(Routes.BILL_EDIT) }
 }
