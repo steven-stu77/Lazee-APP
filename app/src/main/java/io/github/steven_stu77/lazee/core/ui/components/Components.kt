@@ -110,15 +110,21 @@ fun InfoBanner(
     }
 }
 
+enum class TagStyle { ON, OFF, WARN }
+
 /** Small rounded status label, e.g. "已开启". */
 @Composable
-fun StatusTag(text: String, highlighted: Boolean = false) {
+fun StatusTag(text: String, highlighted: Boolean = false, style: TagStyle = if (highlighted) TagStyle.ON else TagStyle.OFF) {
     val p = LocalPalette.current
+    val (bg, fg) = when (style) {
+        TagStyle.ON -> p.tint to p.tintText
+        TagStyle.OFF -> Base.divider to Base.textSub
+        TagStyle.WARN -> Base.warnBg to Base.warnText
+    }
     Text(
         text,
-        style = Type.tiny.copy(color = if (highlighted) p.tintText else Base.textSub, fontWeight = FontWeight.Medium),
-        modifier = Modifier.clip(Dims.tagRadius).background(if (highlighted) p.tint else Base.divider)
-            .padding(horizontal = 8.dp, vertical = 3.dp),
+        style = Type.tiny.copy(color = fg, fontWeight = FontWeight.Medium),
+        modifier = Modifier.clip(Dims.tagRadius).background(bg).padding(horizontal = 8.dp, vertical = 3.dp),
     )
 }
 
@@ -144,6 +150,7 @@ fun SettingRow(
     description: String? = null,
     status: String? = null,
     statusOn: Boolean = false,
+    statusStyle: TagStyle = if (statusOn) TagStyle.ON else TagStyle.OFF,
     checked: Boolean? = null,
     onCheckedChange: ((Boolean) -> Unit)? = null,
     onClick: (() -> Unit)? = null,
@@ -159,7 +166,7 @@ fun SettingRow(
             Text(title, style = Type.body)
             if (description != null) Text(description, style = Type.tiny)
         }
-        if (status != null) StatusTag(status, statusOn)
+        if (status != null) StatusTag(status, style = statusStyle)
         if (checked != null && onCheckedChange != null) LazeeSwitch(checked, onCheckedChange, title)
         else if (onClick != null) Icon(LazeeIcons.ChevronRight, null, tint = Base.disabled, modifier = Modifier.size(18.dp))
     }
@@ -203,22 +210,23 @@ fun AmountText(
 @Composable
 fun moneyText(cents: Long): String = Money.format(cents, LocalHideAmounts.current)
 
-/** Back / close header for sub-pages. */
+/** Back / close header for sub-pages: white round button + 20sp bold title (prototype). */
 @Composable
 fun SubPageHeader(title: String, onBack: () -> Unit, backLabel: String, close: Boolean = false, actions: @Composable RowScope.() -> Unit = {}) {
     Row(
-        Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
+        Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Box(
-            Modifier.size(Dims.minTouch).clip(CircleShape).clickable(role = Role.Button, onClickLabel = backLabel, onClick = onBack),
+            Modifier.size(Dims.minTouch).clip(CircleShape).background(Base.card)
+                .clickable(role = Role.Button, onClickLabel = backLabel, onClick = onBack),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(if (close) LazeeIcons.Close else LazeeIcons.ChevronLeft, backLabel, tint = Base.text, modifier = Modifier.size(24.dp))
+            Icon(if (close) LazeeIcons.Close else LazeeIcons.ChevronLeft, backLabel, tint = Base.text, modifier = Modifier.size(22.dp))
         }
-        Text(title, style = Type.section.copy(fontSize = 17.sp), modifier = Modifier.weight(1f).padding(start = 4.dp))
+        Text(title, style = Type.pageTitle.copy(fontSize = 20.sp), modifier = Modifier.weight(1f))
         actions()
-        Box(Modifier.width(8.dp))
     }
 }
 
@@ -274,4 +282,10 @@ fun Chip(text: String, selected: Boolean, onClick: () -> Unit, onLongClick: (() 
             .clickable(role = Role.Button, onClick = onClick)
             .heightIn(min = 36.dp).padding(horizontal = 12.dp, vertical = 8.dp),
     )
+}
+
+/** Plain tappable row for dialogs and menus. */
+@Composable
+fun MenuItem(text: String, onClick: () -> Unit) {
+    Text(text, style = Type.body, modifier = Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick).padding(vertical = 14.dp))
 }

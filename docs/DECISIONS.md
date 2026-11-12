@@ -11,3 +11,6 @@ One line per judgement call made during development.
 - The `Transaction` entity is stored in a table named `Txn` so it never clashes with Room's `@Transaction` annotation or the SQL keyword.
 - `CategoryBudget.limit` is named `amountLimit` because `LIMIT` is an SQL keyword.
 - The CI signing secrets cannot be set from the dev container (no access to the secrets API). The workflow falls back to the default debug key and says so in the Release notes; README explains how to add the secrets once.
+- Category reordering uses "Move earlier / Move later" in the long-press menu instead of drag-and-drop: dragging inside a wrapping grid is fiddly on small phones and easy to trigger by accident.
+- Screenshot tests (`app/src/test/.../android/ScreenshotTest.kt`) run the real app under Robolectric with an in-memory Room database (SQLCipher's native library cannot load on the JVM) and write PNGs to `app/build/screenshots`. They double as an end-to-end smoke test of Hilt + navigation. On sandboxed machines that cannot download Robolectric's Android jars, set `ROBOLECTRIC_DEPS_DIR` to a folder holding them.
+- Loan principal is recorded as a TRANSFER with no target account (positive = money leaves the account, negative = money comes in), so it never counts as income or spending; interest is a normal INCOME/EXPENSE.

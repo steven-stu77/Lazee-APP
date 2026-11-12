@@ -16,7 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import io.github.steven_stu77.lazee.core.ui.theme.Base
 
 @Composable
-fun LazeeNavHost(startOnboarding: Boolean) {
+fun LazeeNavHost(startOnboarding: Boolean, deepLink: String? = null) {
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route
@@ -25,6 +25,10 @@ fun LazeeNavHost(startOnboarding: Boolean) {
             NavHost(nav, startDestination = if (startOnboarding) Routes.ONBOARDING else Routes.HOME) {
                 appGraph(nav)
             }
+            io.github.steven_stu77.lazee.core.ui.components.ToastHost()
+        }
+        androidx.compose.runtime.LaunchedEffect(deepLink) {
+            if (deepLink != null && !startOnboarding) nav.navigate(deepLink)
         }
         if (route in Routes.tabs) {
             BottomBar(route, onTab = { nav.switchTab(it) }, onAdd = { nav.navigate(Routes.add()) })
