@@ -38,7 +38,7 @@ data class Palette(
     val heat: List<Color>,
 )
 
-private fun c(hex: Long) = Color(0xFF000000 or hex)
+private fun c(hex: Int) = Color(0xFF000000.toInt() or hex)
 
 object Palettes {
     val green = Palette(

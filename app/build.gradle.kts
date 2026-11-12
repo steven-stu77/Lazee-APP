@@ -69,6 +69,8 @@ android {
 
     androidResources {
         generateLocaleConfig = false
+        // Only English and Chinese; drops library translations we never show.
+        localeFilters += listOf("en", "zh")
     }
 
     testOptions {
