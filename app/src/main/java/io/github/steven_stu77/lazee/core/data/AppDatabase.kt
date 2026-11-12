@@ -31,6 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun loans(): LoanDao
     abstract fun pending(): PendingDao
     abstract fun merchantRules(): MerchantRuleDao
+    abstract fun restore(): RestoreDao
 
     companion object {
         const val NAME = "lazee.db"

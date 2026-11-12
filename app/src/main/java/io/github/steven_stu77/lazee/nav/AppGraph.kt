@@ -19,6 +19,7 @@ import io.github.steven_stu77.lazee.feature.accounts.AccountEditScreen
 import io.github.steven_stu77.lazee.feature.add.AddScreen
 import io.github.steven_stu77.lazee.feature.categories.CategoriesScreen
 import io.github.steven_stu77.lazee.feature.bills.BillEditScreen
+import io.github.steven_stu77.lazee.feature.backup.BackupScreen
 import io.github.steven_stu77.lazee.feature.bills.BillsScreen
 import io.github.steven_stu77.lazee.feature.loans.LoansScreen
 import io.github.steven_stu77.lazee.feature.settings.RemindersScreen
@@ -36,6 +37,8 @@ import io.github.steven_stu77.lazee.feature.stats.StatsScreen
 import io.github.steven_stu77.lazee.feature.stats.YearScreen
 import io.github.steven_stu77.lazee.feature.budget.BudgetScreen
 import io.github.steven_stu77.lazee.core.logic.BillMath
+import io.github.steven_stu77.lazee.core.security.AppLock
+import io.github.steven_stu77.lazee.core.ui.components.ToastBus
 import io.github.steven_stu77.lazee.feature.txn.TxnDetailScreen
 
 const val NEW_CATEGORY_RESULT = "newCategoryId"
@@ -95,7 +98,17 @@ fun NavGraphBuilder.appGraph(nav: NavHostController) {
     }
     composable(Routes.ME) {
         val vm: MeViewModel = hiltViewModel()
-        MeScreen(onNavigate = { nav.navigate(it) }, onLockToggle = vm::setAppLock, vm = vm)
+        val activity = androidx.compose.ui.platform.LocalContext.current as androidx.fragment.app.FragmentActivity
+        val title = androidx.compose.ui.res.stringResource(io.github.steven_stu77.lazee.R.string.app_lock)
+        val noLock = androidx.compose.ui.res.stringResource(io.github.steven_stu77.lazee.R.string.lock_no_screen_lock)
+        MeScreen(onNavigate = { nav.navigate(it) }, onLockToggle = { on ->
+            when {
+                !on -> vm.setAppLock(false)
+                !AppLock.canAuthenticate(activity) -> ToastBus.show(noLock)
+                // Prove it works before switching it on, so nobody locks themselves out.
+                else -> AppLock.prompt(activity, title, onSuccess = { vm.setAppLock(true) })
+            }
+        }, vm = vm)
     }
     composable(Routes.ACCOUNT, arguments = listOf(longArg("id"))) {
         AccountDetailScreen(onBack = back, onEdit = { nav.navigate(Routes.accountEdit(it)) }, onTxn = { nav.navigate(Routes.txn(it)) })
@@ -121,7 +134,9 @@ fun NavGraphBuilder.appGraph(nav: NavHostController) {
     composable(Routes.LOANS) { LoansScreen(onBack = back) }
     composable(Routes.REMINDERS) { RemindersScreen(onBack = back) }
 
-    listOf(Routes.BACKUP, Routes.LOOK, Routes.ABOUT).forEach { r -> composable(r) { Placeholder(r) } }
+    composable(Routes.BACKUP) { BackupScreen(onBack = back) }
+
+    listOf(Routes.LOOK, Routes.ABOUT).forEach { r -> composable(r) { Placeholder(r) } }
 }
 
 @Composable

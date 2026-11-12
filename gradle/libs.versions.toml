@@ -15,6 +15,7 @@ datastore = "1.1.7"
 work = "2.10.2"
 biometric = "1.1.0"
 exifinterface = "1.4.1"
+documentfile = "1.1.0"
 sqlcipher = "4.20.0"
 sqlite = "2.5.2"
 serialization = "1.8.0"
@@ -61,6 +62,7 @@ sqlcipher-android = { module = "net.zetetic:sqlcipher-android", version.ref = "s
 androidx-sqlite = { module = "androidx.sqlite:sqlite", version.ref = "sqlite" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentfile" }
 exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
