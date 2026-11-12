@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Keep en and zh in sync: every key exists in both files. -->
+<resources>
+    <string name="app_name">懒记</string>
+    <string name="app_tagline">给懒人用的记账 App，你睡觉它也在帮你记</string>
+    <string name="nav_home">明细</string>
+    <string name="nav_stats">统计</string>
+    <string name="nav_budget">预算</string>
+    <string name="nav_me">我的</string>
+    <string name="add_title">记一笔</string>
+    <string name="back">返回</string>
+    <string name="close">关闭</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="delete">删除</string>
+    <string name="edit">编辑</string>
+    <string name="confirm">确认</string>
+    <string name="ok">好</string>
+    <string name="skip">跳过</string>
+    <string name="next">下一步</string>
+    <string name="done">完成</string>
+</resources>

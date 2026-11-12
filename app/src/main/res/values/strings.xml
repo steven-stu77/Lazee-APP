@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Keep en and zh in sync: every key exists in both files. -->
+<resources>
+    <string name="app_name">Lazee</string>
+    <string name="app_tagline">Logs your spending while you sleep</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_stats">Stats</string>
+    <string name="nav_budget">Budget</string>
+    <string name="nav_me">Me</string>
+    <string name="add_title">Add expense</string>
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="confirm">Confirm</string>
+    <string name="ok">OK</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="done">Done</string>
+</resources>
