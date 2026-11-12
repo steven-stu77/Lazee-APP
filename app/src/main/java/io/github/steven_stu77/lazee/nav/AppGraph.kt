@@ -24,6 +24,11 @@ import io.github.steven_stu77.lazee.feature.me.MeScreen
 import io.github.steven_stu77.lazee.feature.me.MeViewModel
 import io.github.steven_stu77.lazee.feature.onboarding.OnboardingScreen
 import io.github.steven_stu77.lazee.feature.search.SearchScreen
+import io.github.steven_stu77.lazee.feature.stats.CategoryDetailScreen
+import io.github.steven_stu77.lazee.feature.stats.StatsScreen
+import io.github.steven_stu77.lazee.feature.stats.YearScreen
+import io.github.steven_stu77.lazee.feature.budget.BudgetScreen
+import io.github.steven_stu77.lazee.core.logic.BillMath
 import io.github.steven_stu77.lazee.feature.txn.TxnDetailScreen
 
 const val NEW_CATEGORY_RESULT = "newCategoryId"
@@ -91,11 +96,18 @@ fun NavGraphBuilder.appGraph(nav: NavHostController) {
     composable(Routes.ACCOUNT_EDIT, arguments = listOf(longArg("id"))) { AccountEditScreen(onBack = back) }
 
     // Filled in by later milestones.
-    listOf(Routes.STATS, Routes.BUDGET, Routes.PENDING, Routes.BILLS, Routes.AUTOLOG, Routes.LOANS, Routes.BACKUP, Routes.LOOK, Routes.REMINDERS, Routes.ABOUT, Routes.PARSER_TEST)
+    composable(Routes.STATS) {
+        StatsScreen(onCategory = { id, ym -> nav.navigate(Routes.categoryDetail(id, BillMath.ym(ym))) }, onYear = { nav.navigate(Routes.year(it)) })
+    }
+    composable(Routes.BUDGET) { BudgetScreen() }
+    composable(Routes.CATEGORY_DETAIL, arguments = listOf(longArg("id"), intArg("ym"))) {
+        CategoryDetailScreen(onBack = back, onTxn = { nav.navigate(Routes.txn(it)) })
+    }
+    composable(Routes.YEAR, arguments = listOf(intArg("year"))) { YearScreen(onBack = back) }
+
+    listOf(Routes.PENDING, Routes.BILLS, Routes.AUTOLOG, Routes.LOANS, Routes.BACKUP, Routes.LOOK, Routes.REMINDERS, Routes.ABOUT, Routes.PARSER_TEST)
         .forEach { r -> composable(r) { Placeholder(r) } }
     composable(Routes.BILL_EDIT, arguments = listOf(longArg("id"))) { Placeholder(Routes.BILL_EDIT) }
-    composable(Routes.CATEGORY_DETAIL, arguments = listOf(longArg("id"), intArg("ym"))) { Placeholder(Routes.CATEGORY_DETAIL) }
-    composable(Routes.YEAR, arguments = listOf(intArg("year"))) { Placeholder(Routes.YEAR) }
 }
 
 @Composable

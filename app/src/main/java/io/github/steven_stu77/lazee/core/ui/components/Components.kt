@@ -289,3 +289,11 @@ fun Chip(text: String, selected: Boolean, onClick: () -> Unit, onLongClick: (() 
 fun MenuItem(text: String, onClick: () -> Unit) {
     Text(text, style = Type.body, modifier = Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick).padding(vertical = 14.dp))
 }
+
+/** Neutral progress bar (no warning colours), e.g. share of the biggest category. */
+@Composable
+fun PlainBar(ratio: Float, modifier: Modifier = Modifier, color: Color = LocalPalette.current.accent) {
+    Box(modifier.fillMaxWidth().heightIn(min = 6.dp).clip(CircleShape).background(Base.divider)) {
+        Box(Modifier.fillMaxWidth(ratio.coerceIn(0f, 1f)).heightIn(min = 6.dp).clip(CircleShape).background(color))
+    }
+}

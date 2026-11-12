@@ -71,6 +71,13 @@ class ScreenshotTest {
         compose.waitForIdle()
     }
 
+    /** Bottom-bar labels also appear in page content; the bar is always the last match. */
+    private fun tapTab(text: String) {
+        val nodes = compose.onAllNodesWithText(text, useUnmergedTree = true)
+        nodes[nodes.fetchSemanticsNodes().size - 1].performClick()
+        compose.waitForIdle()
+    }
+
     /** Room and DataStore load on background threads that Compose idling does not track. */
     @OptIn(ExperimentalTestApi::class)
     private fun waitFor(text: String) {
@@ -86,7 +93,9 @@ class ScreenshotTest {
         launch().use {
             waitFor("茶餐室 早餐")
             shot("02-home")
-            tap("我的"); shot("03-me")
+            tapTab("统计"); shot("08-stats")
+            tapTab("预算"); shot("09-budget")
+            tapTab("我的"); shot("03-me")
             tap("分类管理"); shot("04-categories")
             tap("+ 新增分类"); shot("05-new-category")
         }
