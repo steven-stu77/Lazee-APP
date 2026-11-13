@@ -77,7 +77,9 @@ fun AutoLogSettingsScreen(onBack: () -> Unit, onParserTest: () -> Unit, vm: Auto
                 SettingRow(stringResource(R.string.al_enable), description = stringResource(R.string.al_enable_sub), checked = on,
                     onCheckedChange = { if (it) consent = true else vm.setEnabled(false) })
             }
+            if (on && s.listenerGranted) StatusCard(s, vm::reconnect)
             if (on && !s.listenerGranted) PermissionHelp(ctx)
+            if (on && isXiaomi()) XiaomiHelp(ctx)
             if (on && s.listenerGranted && !s.batteryOk) BatteryHelp(ctx)
 
             Text(stringResource(R.string.al_lazy), style = Type.small, modifier = Modifier.padding(horizontal = 4.dp))
@@ -165,6 +167,48 @@ private fun BatteryHelp(ctx: Context) {
                 .onFailure { ctx.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) }
         }, Modifier.fillMaxWidth())
         Text(stringResource(R.string.al_autostart_note), style = Type.tiny)
+    }
+}
+
+private fun isXiaomi() = Build.MANUFACTURER.lowercase() in setOf("xiaomi", "redmi", "poco")
+
+@Composable
+private fun StatusCard(s: AutoLogSettingsUiState, onReconnect: () -> Unit) {
+    val fmt = java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT)
+    SectionCard {
+        Text(stringResource(R.string.al_status), style = Type.section)
+        Text(
+            if (s.connectedAt > 0) stringResource(R.string.al_status_connected, fmt.format(java.util.Date(s.connectedAt)))
+            else stringResource(R.string.al_status_not_connected),
+            style = Type.small.copy(color = if (s.connectedAt > 0) LocalPalette.current.tintText else Base.warnStrong),
+        )
+        val last = s.lastSeen
+        Text(
+            if (last == null) stringResource(R.string.al_status_none_yet)
+            else stringResource(R.string.al_status_last, last.first, fmt.format(java.util.Date(last.second)), stringResource(outcomeText(last.third))),
+            style = Type.small.copy(color = Base.text),
+        )
+        SecondaryButton(stringResource(R.string.al_reconnect), onReconnect, Modifier.fillMaxWidth())
+    }
+}
+
+private fun outcomeText(o: String) = when (o) {
+    "PENDING" -> R.string.al_out_pending
+    "AUTO_LOGGED" -> R.string.al_out_auto
+    "DUPLICATE" -> R.string.al_out_duplicate
+    "NOT_PAYMENT" -> R.string.al_out_not_payment
+    "APP_OFF" -> R.string.al_out_app_off
+    else -> R.string.al_out_error
+}
+
+@Composable
+private fun XiaomiHelp(ctx: Context) {
+    SectionCard {
+        Text(stringResource(R.string.al_xiaomi_title), style = Type.section)
+        Text(stringResource(R.string.al_xiaomi_steps), style = Type.small.copy(color = Base.text))
+        SecondaryButton(stringResource(R.string.al_open_app_info), {
+            ctx.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${ctx.packageName}")))
+        }, Modifier.fillMaxWidth())
     }
 }
 

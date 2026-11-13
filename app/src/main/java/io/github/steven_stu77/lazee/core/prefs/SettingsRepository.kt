@@ -47,6 +47,8 @@ class SettingsRepository @Inject constructor(@ApplicationContext context: Contex
         val alertsSent = stringSetPreferencesKey("budgetAlertsSent")
         val pkgAccounts = stringSetPreferencesKey("packageAccounts")
         val dbPass = stringPreferencesKey("dbPassphraseEncrypted")
+        val listenerAt = longPreferencesKey("listenerConnectedAt")
+        val lastSeen = stringPreferencesKey("lastNotificationSeen")
     }
 
     val settings: Flow<Settings> = store.data.map(::toSettings)
@@ -106,6 +108,11 @@ class SettingsRepository @Inject constructor(@ApplicationContext context: Contex
         val rest = (it[K.pkgAccounts] ?: emptySet()).filterNot { e -> e.startsWith("$pkg=") }.toSet()
         it[K.pkgAccounts] = rest + "$pkg=$accountId"
     }
+
+    /** Auto-log health, no notification text: "package|epochMillis|OUTCOME". */
+    val autoLogStatus: Flow<Pair<Long, String?>> = store.data.map { (it[K.listenerAt] ?: 0L) to it[K.lastSeen] }
+    suspend fun setListenerConnectedAt(v: Long) = edit { it[K.listenerAt] = v }
+    suspend fun setLastSeen(pkg: String, at: Long, outcome: String) = edit { it[K.lastSeen] = "$pkg|$at|$outcome" }
 
     suspend fun dbPassphraseEncrypted(): String? = store.data.first()[K.dbPass]
     suspend fun setDbPassphraseEncrypted(v: String) = edit { it[K.dbPass] = v }

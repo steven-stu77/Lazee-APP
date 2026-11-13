@@ -43,13 +43,13 @@ class AutoLogProcessor @Inject constructor(
     // Notifications can arrive in bursts; process one at a time so dedupe and pairing see each other.
     private val lock = Mutex()
 
-    suspend fun process(pkg: String, text: String, postedAt: Instant = Instant.now()) = lock.withLock {
-        val parsed = config.engine.parse(pkg, text) ?: return@withLock
+    suspend fun process(pkg: String, text: String, postedAt: Instant = Instant.now()): Outcome = lock.withLock {
+        val parsed = config.engine.parse(pkg, text) ?: return@withLock Outcome.NOT_PAYMENT
         val s = settings.current()
         val key = MerchantKey.of(parsed.merchant)
         val dedupe = Matcher.dedupeKey(pkg, parsed.amount, key, postedAt)
         val dao = db.pending()
-        if (dao.countKey(dedupe) > 0) return@withLock
+        if (dao.countKey(dedupe) > 0) return@withLock Outcome.DUPLICATE
 
         val incoming = parsed.incoming
         val date = Matcher.localDate(postedAt)
@@ -93,27 +93,31 @@ class AutoLogProcessor @Inject constructor(
 
         if (pair != null) {
             // Merge: the earlier half becomes the transfer; this half is kept only for dedupe.
-            val first = dao.get(pair.id) ?: return@withLock
+            val first = dao.get(pair.id) ?: return@withLock Outcome.PENDING
             val newId = dao.insert(item.copy(status = PendingStatus.IGNORED, transferPairId = first.id))
             dao.update(first.copy(transferPairId = newId, matchedBillId = null, possibleDuplicateOf = null, confidence = Confidence.HIGH))
             notifications.cancelPending(first.id)
             notifications.showPending(dao.get(first.id)!!)
-            return@withLock
+            return@withLock Outcome.PENDING
         }
 
         if (Matcher.shouldAutoLog(s.lazyAutoFamiliar, item.confidence, memory, bill != null, dup != null, item.transferPairId != null)) {
             val id = dao.insert(item.copy(status = PendingStatus.CONFIRMED))
-            if (id < 0) return@withLock
+            if (id < 0) return@withLock Outcome.DUPLICATE
             val txnId = ledger.saveTransaction(repo.toTransaction(item, categoryId, isAuto = true))
             repo.remember(key, categoryId!!, null)
             notifications.showAutoLogged(txnId, item, categoryId)
-            return@withLock
+            return@withLock Outcome.AUTO_LOGGED
         }
 
         val id = dao.insert(item)
-        if (id < 0) return@withLock
+        if (id < 0) return@withLock Outcome.DUPLICATE
         if (s.lazyQuickConfirm) notifications.showPending(item.copy(id = id))
+        Outcome.PENDING
     }
+
+    /** What happened to one notification; shown (without any text) on the auto-log page. */
+    enum class Outcome { PENDING, AUTO_LOGGED, DUPLICATE, NOT_PAYMENT, APP_OFF, ERROR }
 
     companion object {
         /** transferPairId placeholder: "between own accounts" but the other half has not arrived. */

@@ -1,7 +1,6 @@
 {
   "package": "my.com.tngdigital.ewallet",
   "displayName": "TNG eWallet",
-  "preview": true,
   "rules": [
     { "direction": "IGNORE", "pattern": "(?i)\\b(reward|promo|voucher|cashback offer|win)\\b" },
     { "direction": "OWN_TRANSFER", "incoming": true, "pattern": "(?i)(?:reload|top[- ]?up)(?: of)? (?:RM|MYR) ?(?<amount>[\\d,]+\\.\\d{2})" },

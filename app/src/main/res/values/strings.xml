@@ -455,4 +455,18 @@
     <string name="fmt_month_title">%3$s %1$d</string>
     <string name="fmt_month_short">%2$s</string>
     <string name="fmt_month_unit"> </string>
+    <string name="al_status">Status</string>
+    <string name="al_status_connected">Listening for payment alerts (connected %1$s)</string>
+    <string name="al_status_not_connected">Not connected — the phone has stopped Lazee\'s listener. Tap Reconnect, and follow the steps below.</string>
+    <string name="al_status_none_yet">No alert from a supported app received yet. Make a small payment to test.</string>
+    <string name="al_status_last">Last alert: %1$s at %2$s · %3$s</string>
+    <string name="al_out_pending">sent to To confirm</string>
+    <string name="al_out_auto">logged automatically</string>
+    <string name="al_out_duplicate">already handled</string>
+    <string name="al_out_not_payment">not a payment, skipped</string>
+    <string name="al_out_app_off">skipped: this app is switched off below</string>
+    <string name="al_out_error">could not be read</string>
+    <string name="al_reconnect">Reconnect</string>
+    <string name="al_xiaomi_title">Xiaomi / Redmi / POCO: one-time setup</string>
+    <string name="al_xiaomi_steps">HyperOS stops background apps unless you allow them:\n1. App info → Autostart → on\n2. App info → Battery saver → No restrictions\n3. Open Recent apps, long-press Lazee → tap the lock icon\nThen tap Reconnect above.</string>
 </resources>

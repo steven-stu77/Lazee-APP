@@ -30,6 +30,9 @@ data class AutoLogSettingsUiState(
     val batteryOk: Boolean = true,
     val apps: List<AppRow> = emptyList(),
     val accounts: List<Account> = emptyList(),
+    val connectedAt: Long = 0,
+    /** Last notification from a supported app: (app name, time, outcome). Never its text. */
+    val lastSeen: Triple<String, Long, String>? = null,
 )
 
 @HiltViewModel
@@ -42,8 +45,12 @@ class AutoLogSettingsViewModel @Inject constructor(
 ) : ViewModel() {
     private val system = MutableStateFlow(false to true)
 
-    val state: StateFlow<AutoLogSettingsUiState> = combine(settings.settings, system, ledger.observeAccounts()) { s, (granted, battery), accs ->
+    val state: StateFlow<AutoLogSettingsUiState> = combine(settings.settings, system, ledger.observeAccounts(), settings.autoLogStatus) { s, (granted, battery), accs, (connected, last) ->
         AutoLogSettingsUiState(
+            connectedAt = connected,
+            lastSeen = last?.split('|')?.takeIf { it.size == 3 }?.let { (pkg, at, outcome) ->
+                Triple(config.engine.config(pkg)?.displayName ?: pkg, at.toLongOrNull() ?: 0, outcome)
+            },
             settings = s,
             listenerGranted = granted,
             batteryOk = battery,
@@ -57,6 +64,11 @@ class AutoLogSettingsViewModel @Inject constructor(
         val granted = NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
         val battery = context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)
         system.value = granted to battery
+    }
+
+    fun reconnect() {
+        io.github.steven_stu77.lazee.feature.autolog.listener.LazeeNotificationListener.reconnect(context)
+        refreshSystemState()
     }
 
     fun setEnabled(on: Boolean) = viewModelScope.launch {

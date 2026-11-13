@@ -455,4 +455,18 @@
     <string name="fmt_month_title">%1$d 年 %2$d 月</string>
     <string name="fmt_month_short">%1$d月</string>
     <string name="fmt_month_unit">月</string>
+    <string name="al_status">运行状态</string>
+    <string name="al_status_connected">正在监听付款通知（%1$s 已连接）</string>
+    <string name="al_status_not_connected">未连接：手机把懒记的监听服务停掉了。请按「重新连接」，并照下面的步骤设置。</string>
+    <string name="al_status_none_yet">还没收到支持的 App 的通知。可以付一小笔钱测试。</string>
+    <string name="al_status_last">最后收到：%1$s %2$s · %3$s</string>
+    <string name="al_out_pending">已放进待确认</string>
+    <string name="al_out_auto">已自动入账</string>
+    <string name="al_out_duplicate">已处理过（重复通知）</string>
+    <string name="al_out_not_payment">不是付款通知，已跳过</string>
+    <string name="al_out_app_off">已跳过：这个 App 在下面没打开</string>
+    <string name="al_out_error">无法识别</string>
+    <string name="al_reconnect">重新连接</string>
+    <string name="al_xiaomi_title">小米 / Redmi / POCO：只需设一次</string>
+    <string name="al_xiaomi_steps">HyperOS 会停掉后台 App，除非你允许：\n1. 应用信息 → 自启动 → 打开\n2. 应用信息 → 省电策略 → 无限制\n3. 打开最近任务，长按懒记 → 点锁头图标锁住\n然后按上面的「重新连接」。</string>
 </resources>
