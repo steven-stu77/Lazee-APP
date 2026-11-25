@@ -19,6 +19,8 @@ data class TxnRow(
     val amount: Long,
     val type: TxnType,
     val isAuto: Boolean,
+    /** "14:05" in the phone's time zone. */
+    val time: String = "",
 )
 
 fun Transaction.toRow(context: Context, categories: Map<Long, Category>, accounts: Map<Long, Account>): TxnRow {
@@ -31,5 +33,6 @@ fun Transaction.toRow(context: Context, categories: Map<Long, Category>, account
         id = id, date = date, title = Labels.txnTitle(context, this, cat), categoryName = catName,
         colorIndex = if (type == TxnType.TRANSFER) 7 else (cat?.colorIndex ?: 7),
         accountName = acc, amount = amount, type = type, isAuto = isAuto,
+        time = createdAt.atZone(java.time.ZoneId.systemDefault()).toLocalTime().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")),
     )
 }

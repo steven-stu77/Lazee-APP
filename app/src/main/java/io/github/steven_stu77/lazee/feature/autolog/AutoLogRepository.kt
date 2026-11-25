@@ -56,7 +56,7 @@ class AutoLogRepository @Inject constructor(
         val account = accountFor(p.sourcePackage) ?: error("no account")
         val base = Transaction(
             type = TxnType.EXPENSE, amount = p.amount, categoryId = categoryId, accountId = account.id,
-            date = Matcher.localDate(p.postedAt), createdAt = Instant.now(), merchant = p.merchant,
+            date = Matcher.localDate(p.postedAt), createdAt = p.postedAt, merchant = p.merchant,
             source = TxnSource.NOTIFICATION, isAuto = isAuto, billId = p.matchedBillId,
         )
         return when {

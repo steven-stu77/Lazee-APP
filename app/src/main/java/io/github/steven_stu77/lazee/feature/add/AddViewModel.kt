@@ -25,12 +25,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 data class AddUiState(
     val type: TxnType = TxnType.EXPENSE,
     val calc: Calculator = Calculator(),
     val date: LocalDate = LocalDate.now(),
+    /** When it happened; stored in Transaction.createdAt together with [date]. */
+    val time: LocalTime = LocalTime.now().truncatedTo(ChronoUnit.MINUTES),
     val categories: List<Category> = emptyList(),
     val allCategories: List<Category> = emptyList(),
     val categoryId: Long? = null,
@@ -101,6 +106,7 @@ class AddViewModel @Inject constructor(
                 type = t.type,
                 calc = Calculator.fromCents(t.amount),
                 date = if (copy) LocalDate.now() else t.date,
+                time = if (copy) LocalTime.now().truncatedTo(ChronoUnit.MINUTES) else t.createdAt.atZone(ZoneId.systemDefault()).toLocalTime().truncatedTo(ChronoUnit.MINUTES),
                 categoryId = cat?.parentId ?: cat?.id,
                 subCategoryId = if (cat?.parentId != null) cat.id else null,
                 categories = topLevel(it.allCategories, t.type),
@@ -126,18 +132,8 @@ class AddViewModel @Inject constructor(
         it.copy(calc = it.calc.collapse(), divideByZero = r.divideByZero)
     }
 
-    /** Tap: today → yesterday → 2 days ago → today. */
-    fun cycleDate() = _state.update {
-        val today = LocalDate.now()
-        val next = when (it.date) {
-            today -> today.minusDays(1)
-            today.minusDays(1) -> today.minusDays(2)
-            else -> today
-        }
-        it.copy(date = next)
-    }
-
     fun setDate(d: LocalDate) = _state.update { it.copy(date = d) }
+    fun setTime(t: LocalTime) = _state.update { it.copy(time = t) }
     fun pickCategory(id: Long) = _state.update { it.copy(categoryId = id, subCategoryId = null) }
     fun pickSub(id: Long) = _state.update { it.copy(subCategoryId = if (it.subCategoryId == id) null else id) }
     fun pickAccount(id: Long) = _state.update { it.copy(accountId = id) }
@@ -181,7 +177,7 @@ class AddViewModel @Inject constructor(
                 accountId = s.accountId!!,
                 toAccountId = if (s.type == TxnType.TRANSFER) s.toAccountId else null,
                 date = s.date,
-                createdAt = base?.createdAt ?: Instant.now(),
+                createdAt = s.date.atTime(s.time).atZone(ZoneId.systemDefault()).toInstant(),
                 note = s.note.trim().ifEmpty { null },
                 merchant = base?.merchant,
                 source = base?.source ?: TxnSource.MANUAL,

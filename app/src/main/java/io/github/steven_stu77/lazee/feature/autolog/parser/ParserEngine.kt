@@ -12,6 +12,8 @@ data class ParserRule(
     val pattern: String,
     /** For OWN_TRANSFER: true when money arrives in this app (a reload), false when it leaves. */
     val incoming: Boolean? = null,
+    /** The example the user built this rule from (user rules only; shown in the editor). */
+    val sample: String? = null,
 )
 
 /** One app's rules: assets/parsers/<package>.json. [preview] = rules written from made-up samples. */
@@ -21,6 +23,8 @@ data class ParserConfig(
     val displayName: String,
     val preview: Boolean = false,
     val rules: List<ParserRule>,
+    /** True for rules the user added in the app (stored on the phone, not in assets). */
+    val custom: Boolean = false,
 )
 
 /** What a notification turned into. Holds no raw text. */
@@ -56,7 +60,21 @@ class ParserEngine(configs: List<ParserConfig>) {
     private fun group(m: MatchResult, name: String): String? = runCatching { m.groups[name]?.value }.getOrNull()
 
     companion object {
-        private val json = Json { ignoreUnknownKeys = true }
+        val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; prettyPrint = true }
         fun decode(text: String): ParserConfig = json.decodeFromString(ParserConfig.serializer(), text)
+
+        /**
+         * User rules go first so they win over the bundled ones; an app that only has user rules
+         * is added as a new supported app.
+         */
+        fun merge(builtIn: List<ParserConfig>, custom: List<ParserConfig>): List<ParserConfig> {
+            val byPkg = custom.associateBy { it.`package` }
+            val merged = builtIn.map { b ->
+                val c = byPkg[b.`package`] ?: return@map b
+                b.copy(rules = c.rules + b.rules, preview = b.preview && c.rules.isEmpty())
+            }
+            val extra = custom.filter { c -> builtIn.none { it.`package` == c.`package` } && c.rules.isNotEmpty() }
+            return (merged + extra).sortedBy { it.displayName.lowercase() }
+        }
     }
 }

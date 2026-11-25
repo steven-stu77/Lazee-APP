@@ -68,6 +68,8 @@ data class BackupData(
     val pending: List<PendingTxn> = emptyList(),
     val merchantRules: List<MerchantRule> = emptyList(),
     val settings: BackupSettings = BackupSettings(),
+    /** The user's own notification rules (added in format 1; older files simply have none). */
+    val customParsers: List<io.github.steven_stu77.lazee.feature.autolog.parser.ParserConfig> = emptyList(),
 )
 
 private object LocalDateSerializer : KSerializer<LocalDate> {

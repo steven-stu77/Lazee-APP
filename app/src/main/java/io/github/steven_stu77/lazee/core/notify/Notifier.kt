@@ -22,7 +22,9 @@ import javax.inject.Singleton
 class Notifier @Inject constructor(@ApplicationContext private val context: Context) {
 
     enum class Channel(val id: String, val nameRes: Int, val importance: Int) {
-        AUTOLOG("autolog", R.string.channel_autolog, NotificationManager.IMPORTANCE_DEFAULT),
+        // HIGH so it pops up after a payment. A channel's importance can't change once created,
+        // hence the new id; the old "autolog" channel is deleted in createChannels().
+        AUTOLOG("autolog_alerts", R.string.channel_autolog, NotificationManager.IMPORTANCE_HIGH),
         BILLS("bills", R.string.channel_bills, NotificationManager.IMPORTANCE_HIGH),
         BUDGET("budget", R.string.channel_budget, NotificationManager.IMPORTANCE_DEFAULT),
         SUMMARY("summary", R.string.channel_summary, NotificationManager.IMPORTANCE_LOW),
@@ -32,6 +34,7 @@ class Notifier @Inject constructor(@ApplicationContext private val context: Cont
     /** Called at startup and after a language change so channel names stay translated. */
     fun createChannels() {
         val nm = context.getSystemService(NotificationManager::class.java)
+        nm.deleteNotificationChannel("autolog")
         Channel.entries.forEach { nm.createNotificationChannel(NotificationChannel(it.id, context.getString(it.nameRes), it.importance)) }
     }
 
@@ -82,6 +85,7 @@ class Notifier @Inject constructor(@ApplicationContext private val context: Cont
         const val ID_DAILY = 3000
         const val ID_MONTHLY = 3001
         const val ID_BACKUP = 4000
+        const val ID_HEALTH = 4001
         const val ID_BILL_BASE = 10_000
         const val ID_AUTOLOG_BASE = 100_000
     }

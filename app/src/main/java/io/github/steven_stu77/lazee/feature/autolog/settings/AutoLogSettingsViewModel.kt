@@ -31,6 +31,7 @@ data class AutoLogSettingsUiState(
     val apps: List<AppRow> = emptyList(),
     val accounts: List<Account> = emptyList(),
     val connectedAt: Long = 0,
+    val healthCheckAt: Long = 0,
     /** Last notification from a supported app: (app name, time, outcome). Never its text. */
     val lastSeen: Triple<String, Long, String>? = null,
 )
@@ -41,12 +42,16 @@ class AutoLogSettingsViewModel @Inject constructor(
     private val settings: SettingsRepository,
     private val config: AutoLogConfig,
     private val repo: AutoLogRepository,
+    private val scheduler: io.github.steven_stu77.lazee.work.WorkScheduler,
     ledger: LedgerRepository,
 ) : ViewModel() {
     private val system = MutableStateFlow(false to true)
 
-    val state: StateFlow<AutoLogSettingsUiState> = combine(settings.settings, system, ledger.observeAccounts(), settings.autoLogStatus) { s, (granted, battery), accs, (connected, last) ->
+    val state: StateFlow<AutoLogSettingsUiState> = combine(
+        combine(settings.settings, settings.healthCheckAt) { s, h -> s to h }, system, ledger.observeAccounts(), settings.autoLogStatus, config.custom,
+    ) { (s, health), (granted, battery), accs, (connected, last), _ ->
         AutoLogSettingsUiState(
+            healthCheckAt = health,
             connectedAt = connected,
             lastSeen = last?.split('|')?.takeIf { it.size == 3 }?.let { (pkg, at, outcome) ->
                 Triple(config.engine.config(pkg)?.displayName ?: pkg, at.toLongOrNull() ?: 0, outcome)
@@ -73,6 +78,7 @@ class AutoLogSettingsViewModel @Inject constructor(
 
     fun setEnabled(on: Boolean) = viewModelScope.launch {
         settings.setAutoLog(on)
+        scheduler.scheduleHealth(settings.current())
         // First time on: tick every supported app so it works straight away.
         if (on && settings.current().enabledPackages.isEmpty()) settings.setEnabledPackages(config.parserConfigs.map { it.`package` }.toSet())
     }

@@ -90,7 +90,7 @@ fun TxnRowView(row: TxnRow, selected: Boolean, onClick: () -> Unit, onLongClick:
                 Text(row.title, style = Type.body.copy(fontWeight = FontWeight.Medium), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                 if (row.isAuto) AutoTag()
             }
-            Text("${row.categoryName} · ${row.accountName}", style = Type.tiny, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(listOf(row.categoryName, row.accountName, row.time).filter { it.isNotEmpty() }.joinToString(" · "), style = Type.tiny, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         val (prefix, color) = when (row.type) {
             TxnType.EXPENSE -> (if (row.amount < 0) "+" else "-") to Base.text

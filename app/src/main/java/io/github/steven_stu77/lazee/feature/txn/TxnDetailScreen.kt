@@ -76,7 +76,7 @@ fun TxnDetailScreen(onBack: () -> Unit, onEdit: (Long) -> Unit, onCopy: (Long) -
                 Field(stringResource(R.string.txn_type), stringResource(when (t.type) { TxnType.EXPENSE -> R.string.expense; TxnType.INCOME -> R.string.income; TxnType.TRANSFER -> R.string.transfer }))
                 if (t.type != TxnType.TRANSFER) Field(stringResource(R.string.txn_category), listOfNotNull(s.parentCategory?.let { categoryName(it) }, categoryName(s.category)).joinToString(" › "))
                 Field(stringResource(R.string.txn_account), if (t.type == TxnType.TRANSFER) "${s.account?.name.orEmpty()} → ${s.toAccount?.name.orEmpty()}" else s.account?.name.orEmpty())
-                Field(stringResource(R.string.txn_date), Labels.dayFull(ctx, t.date))
+                Field(stringResource(R.string.txn_date), Labels.dayFull(ctx, t.date) + "  " + t.createdAt.atZone(java.time.ZoneId.systemDefault()).toLocalTime().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")))
                 t.merchant?.let { Field(stringResource(R.string.txn_merchant), it) }
                 t.note?.let { Field(stringResource(R.string.txn_note), it) }
                 if (s.tags.isNotEmpty()) Field(stringResource(R.string.txn_tags), s.tags.joinToString("  ") { "#$it" })

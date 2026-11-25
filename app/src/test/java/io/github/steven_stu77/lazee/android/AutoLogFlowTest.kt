@@ -40,6 +40,7 @@ class AutoLogFlowTest {
     @Inject lateinit var settings: SettingsRepository
     @Inject lateinit var processor: AutoLogProcessor
     @Inject lateinit var repo: AutoLogRepository
+    @Inject lateinit var config: io.github.steven_stu77.lazee.feature.autolog.AutoLogConfig
     @Inject lateinit var bills: io.github.steven_stu77.lazee.core.repo.BillRepository
 
     private val tng = "my.com.tngdigital.ewallet"
@@ -127,5 +128,20 @@ class AutoLogFlowTest {
         assertThat(p.matchedBillId).isNull() // already paid this month
         assertThat(p.possibleDuplicateOf).isNotNull()
         assertThat(ledger.allTransactions()).hasSize(1) // only the manual one
+    }
+
+    @Test fun ruleAddedInTheAppWorksImmediatelyForANewApp() = runBlocking {
+        val boost = "my.com.myboost"
+        assertThat(processor.process(boost, "Boost: You spent RM12.30 at Tealive Sunway.", now)).isEqualTo(AutoLogProcessor.Outcome.NOT_PAYMENT)
+        val pattern = (io.github.steven_stu77.lazee.feature.autolog.parser.RuleBuilder.build(
+            "Boost: You spent RM5.00 at KFC Damansara.", "RM5.00", "KFC Damansara",
+        ) as io.github.steven_stu77.lazee.feature.autolog.parser.RuleBuilder.Result.Ok).pattern
+        config.saveCustom(listOf(io.github.steven_stu77.lazee.feature.autolog.parser.ParserConfig(boost, "Boost", custom = true,
+            rules = listOf(io.github.steven_stu77.lazee.feature.autolog.parser.ParserRule(io.github.steven_stu77.lazee.feature.autolog.parser.Direction.OUT, pattern)))))
+        assertThat(processor.process(boost, "Boost: You spent RM12.30 at Tealive Sunway.", now.plusSeconds(60))).isEqualTo(AutoLogProcessor.Outcome.PENDING)
+        val p = pendingItems().single()
+        assertThat(p.amount).isEqualTo(1230)
+        assertThat(p.merchant).isEqualTo("Tealive Sunway")
+        assertThat(p.suggestedCategoryId).isEqualTo(ledger.categoryByKey("food")!!.id)
     }
 }

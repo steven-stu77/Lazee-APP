@@ -62,7 +62,7 @@ import io.github.steven_stu77.lazee.feature.search.ListPicker
 private val rowPad = PaddingValues(horizontal = 20.dp, vertical = 4.dp)
 
 @Composable
-fun AutoLogSettingsScreen(onBack: () -> Unit, onParserTest: () -> Unit, vm: AutoLogSettingsViewModel = hiltViewModel()) {
+fun AutoLogSettingsScreen(onBack: () -> Unit, onParserTest: () -> Unit, onRules: () -> Unit, vm: AutoLogSettingsViewModel = hiltViewModel()) {
     val s by vm.state.collectAsStateWithLifecycle()
     val ctx = LocalContext.current
     var consent by remember { mutableStateOf(false) }
@@ -108,6 +108,9 @@ fun AutoLogSettingsScreen(onBack: () -> Unit, onParserTest: () -> Unit, vm: Auto
                         LazeeSwitch(a.enabled, { vm.setApp(a.config.`package`, it) }, a.config.displayName)
                     }
                 }
+            }
+            SectionCard(padding = rowPad) {
+                SettingRow(stringResource(R.string.al_rules), description = stringResource(R.string.al_rules_sub), onClick = onRules)
             }
             if (s.apps.any { it.config.preview }) Text(stringResource(R.string.al_preview_rules_note), style = Type.tiny, modifier = Modifier.padding(horizontal = 4.dp))
 
@@ -188,6 +191,7 @@ private fun StatusCard(s: AutoLogSettingsUiState, onReconnect: () -> Unit) {
             else stringResource(R.string.al_status_last, last.first, fmt.format(java.util.Date(last.second)), stringResource(outcomeText(last.third))),
             style = Type.small.copy(color = Base.text),
         )
+        if (s.healthCheckAt > 0) Text(stringResource(R.string.hc_last, fmt.format(java.util.Date(s.healthCheckAt))), style = Type.tiny)
         SecondaryButton(stringResource(R.string.al_reconnect), onReconnect, Modifier.fillMaxWidth())
     }
 }

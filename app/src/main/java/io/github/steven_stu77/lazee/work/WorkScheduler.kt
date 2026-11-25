@@ -33,6 +33,7 @@ class WorkScheduler @Inject constructor(@ApplicationContext private val context:
         daily<BillReminderWorker>(BillReminderWorker.NAME, LocalTime.of(9, 0), ExistingPeriodicWorkPolicy.KEEP)
         daily<MonthlySummaryWorker>(MonthlySummaryWorker.NAME, LocalTime.of(9, 5), ExistingPeriodicWorkPolicy.KEEP)
         scheduleNightly(s, ExistingPeriodicWorkPolicy.KEEP)
+        scheduleHealth(s)
         scheduleBackup(s, ExistingPeriodicWorkPolicy.KEEP)
     }
 
@@ -49,6 +50,15 @@ class WorkScheduler @Inject constructor(@ApplicationContext private val context:
             .setConstraints(Constraints.Builder().setRequiresBatteryNotLow(true).build())
             .build()
         wm.enqueueUniquePeriodicWork(AutoBackupWorker.NAME, policy, req)
+    }
+
+    /** Auto-log health check every 15 minutes (WorkManager's minimum) while auto-log is on. */
+    fun scheduleHealth(s: Settings) {
+        if (!s.autoLogEnabled) { wm.cancelUniqueWork(ListenerHealthWorker.NAME); return }
+        wm.enqueueUniquePeriodicWork(
+            ListenerHealthWorker.NAME, ExistingPeriodicWorkPolicy.KEEP,
+            PeriodicWorkRequestBuilder<ListenerHealthWorker>(15, TimeUnit.MINUTES).build(),
+        )
     }
 
     /** "Remind me tomorrow" on a bill reminder. */

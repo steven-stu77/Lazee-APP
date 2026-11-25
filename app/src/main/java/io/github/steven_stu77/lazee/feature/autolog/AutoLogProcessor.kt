@@ -112,7 +112,7 @@ class AutoLogProcessor @Inject constructor(
 
         val id = dao.insert(item)
         if (id < 0) return@withLock Outcome.DUPLICATE
-        if (s.lazyQuickConfirm) notifications.showPending(item.copy(id = id))
+        notifications.showPending(item.copy(id = id), withActions = s.lazyQuickConfirm)
         Outcome.PENDING
     }
 

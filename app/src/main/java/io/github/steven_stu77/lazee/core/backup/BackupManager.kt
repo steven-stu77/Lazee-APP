@@ -29,6 +29,7 @@ class BackupManager @Inject constructor(
     private val db: AppDatabase,
     private val settings: SettingsRepository,
     private val photos: PhotoStore,
+    private val autoLogConfig: io.github.steven_stu77.lazee.feature.autolog.AutoLogConfig,
 ) {
     /** Saves the password wrapped by the Keystore so automatic backups can use it. */
     suspend fun setPassword(password: CharArray) = settings.setBackupPasswordEncrypted(KeystoreCipher.encrypt(String(password).toByteArray()))
@@ -45,6 +46,7 @@ class BackupManager @Inject constructor(
             budgets = db.budgets().all(), goals = db.goals().allGoals(), contributions = db.goals().allContributions(),
             bills = db.bills().all(), billPayments = db.bills().allPayments(), loans = db.loans().all(),
             repayments = db.loans().allRepayments(), pending = db.pending().all(), merchantRules = db.merchantRules().all(),
+            customParsers = autoLogConfig.custom.value,
             settings = BackupSettings(
                 s.language, s.theme.name, s.monthlyBudget, s.autoLogEnabled, s.enabledPackages, s.lazyQuickConfirm,
                 s.lazyAutoFamiliar, s.nightlySummary, s.nightlySummaryMinutes, s.budgetAlerts, s.packageAccounts,
@@ -100,6 +102,7 @@ class BackupManager @Inject constructor(
             r.bills(data.bills); r.billPayments(data.billPayments); r.loans(data.loans); r.repayments(data.repayments)
             r.pending(data.pending); r.merchantRules(data.merchantRules)
         }
+        runCatching { autoLogConfig.saveCustom(data.customParsers) }
         photos.dir.listFiles().orEmpty().forEach { it.delete() }
         photoFiles.forEach { (name, bytes) -> File(photos.dir, File(name).name).writeBytes(bytes) }
         val b = data.settings

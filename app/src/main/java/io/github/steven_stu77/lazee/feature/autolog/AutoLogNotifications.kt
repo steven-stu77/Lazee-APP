@@ -30,13 +30,16 @@ class AutoLogNotifications @Inject constructor(
 
     private fun appName(pkg: String) = config.engine.config(pkg)?.displayName ?: pkg
 
-    suspend fun showPending(p: PendingTxn) {
+    /** Always shown after a payment; [withActions] adds Confirm / Change / Ignore (lazy mode). */
+    suspend fun showPending(p: PendingTxn, withActions: Boolean = true) {
         val cat = Labels.categoryName(context, p.suggestedCategoryId?.let { ledger.category(it) })
         val title = context.getString(R.string.an_pending_title, p.merchant, Money.format(p.amount), cat)
         val body = context.getString(R.string.an_from_app, appName(p.sourcePackage))
         val notifId = Notifier.ID_AUTOLOG_BASE + (p.id % 50_000).toInt()
         val b = notifier.builder(Notifier.Channel.AUTOLOG, title, body, context.getString(R.string.an_public))
             .setContentIntent(notifier.openApp(Routes.PENDING, notifId))
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+        if (withActions) b
             .addAction(0, context.getString(R.string.confirm), action(PendingActionReceiver.CONFIRM, p.id, notifId))
             .addAction(0, context.getString(R.string.an_change), notifier.openApp(Routes.PENDING, notifId + 1))
             .addAction(0, context.getString(R.string.an_ignore), action(PendingActionReceiver.IGNORE, p.id, notifId + 2))
@@ -53,7 +56,7 @@ class AutoLogNotifications @Inject constructor(
             context.getString(R.string.an_auto_title, p.merchant, Money.format(p.amount)),
             context.getString(R.string.an_auto_body, cat),
             context.getString(R.string.an_public),
-        ).setSilent(true)
+        ).setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(notifier.openApp(Routes.txn(txnId), notifId))
             .addAction(0, context.getString(R.string.an_undo), action(PendingActionReceiver.UNDO, txnId, notifId))
         notifier.post(notifId, b)

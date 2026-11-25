@@ -99,6 +99,10 @@ class ScreenshotTest {
             tapTab("预算"); shot("09-budget")
             tapTab("我的"); shot("03-me")
             tap("通知自动记账"); waitFor("记到："); shot("11-autolog")
+            tap("识别规则"); shot("13-rules")
+            tap("+ 新规则"); waitFor("哪个 App"); shot("14-rule-editor")
+            compose.onAllNodesWithContentDescription("返回")[0].performClick(); compose.waitForIdle()
+            compose.onAllNodesWithContentDescription("返回")[0].performClick(); compose.waitForIdle()
             compose.onAllNodesWithContentDescription("返回")[0].performClick(); compose.waitForIdle()
             tap("账单提醒"); waitFor("Unifi"); shot("12-bills")
             compose.onAllNodesWithContentDescription("返回")[0].performClick(); compose.waitForIdle()
@@ -115,6 +119,8 @@ class ScreenshotTest {
             compose.waitForIdle()
             for (k in "12+8.5") tap(k.toString())
             shot("07-add")
+            compose.onAllNodesWithText("今天 ", substring = true, useUnmergedTree = true)[0].performClick(); compose.waitForIdle()
+            shot("15-add-datetime")
         }
     }
 }

@@ -49,6 +49,8 @@ class SettingsRepository @Inject constructor(@ApplicationContext context: Contex
         val dbPass = stringPreferencesKey("dbPassphraseEncrypted")
         val listenerAt = longPreferencesKey("listenerConnectedAt")
         val lastSeen = stringPreferencesKey("lastNotificationSeen")
+        val healthAt = longPreferencesKey("healthCheckAt")
+        val healthWarned = longPreferencesKey("healthWarnedAt")
     }
 
     val settings: Flow<Settings> = store.data.map(::toSettings)
@@ -111,6 +113,10 @@ class SettingsRepository @Inject constructor(@ApplicationContext context: Contex
 
     /** Auto-log health, no notification text: "package|epochMillis|OUTCOME". */
     val autoLogStatus: Flow<Pair<Long, String?>> = store.data.map { (it[K.listenerAt] ?: 0L) to it[K.lastSeen] }
+    val healthCheckAt: Flow<Long> = store.data.map { it[K.healthAt] ?: 0L }
+    suspend fun setHealthCheckAt(v: Long) = edit { it[K.healthAt] = v }
+    suspend fun healthWarnedAt(): Long = store.data.first()[K.healthWarned] ?: 0L
+    suspend fun setHealthWarnedAt(v: Long) = edit { it[K.healthWarned] = v }
     suspend fun setListenerConnectedAt(v: Long) = edit { it[K.listenerAt] = v }
     suspend fun setLastSeen(pkg: String, at: Long, outcome: String) = edit { it[K.lastSeen] = "$pkg|$at|$outcome" }
 

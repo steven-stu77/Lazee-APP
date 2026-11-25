@@ -22,6 +22,8 @@ import io.github.steven_stu77.lazee.feature.settings.AboutScreen
 import io.github.steven_stu77.lazee.feature.autolog.pending.PendingScreen
 import io.github.steven_stu77.lazee.feature.autolog.settings.AutoLogSettingsScreen
 import io.github.steven_stu77.lazee.feature.autolog.settings.ParserTestScreen
+import io.github.steven_stu77.lazee.feature.autolog.rules.RuleEditorScreen
+import io.github.steven_stu77.lazee.feature.autolog.rules.RulesScreen
 import io.github.steven_stu77.lazee.feature.categories.NewCategoryScreen
 import io.github.steven_stu77.lazee.feature.home.HomeScreen
 import io.github.steven_stu77.lazee.feature.me.MeScreen
@@ -122,7 +124,14 @@ fun NavGraphBuilder.appGraph(nav: NavHostController) {
     composable(Routes.YEAR, arguments = listOf(intArg("year"))) { YearScreen(onBack = back) }
 
     composable(Routes.PENDING) { PendingScreen(onBack = back) }
-    composable(Routes.AUTOLOG) { AutoLogSettingsScreen(onBack = back, onParserTest = { nav.navigate(Routes.PARSER_TEST) }) }
+    composable(Routes.AUTOLOG) {
+        AutoLogSettingsScreen(onBack = back, onParserTest = { nav.navigate(Routes.PARSER_TEST) }, onRules = { nav.navigate(Routes.RULES) })
+    }
+    composable(Routes.RULES) { RulesScreen(onBack = back, onEdit = { pkg, i -> nav.navigate(Routes.ruleEdit(pkg, i)) }) }
+    composable(
+        Routes.RULE_EDIT,
+        arguments = listOf(navArgument("pkg") { type = NavType.StringType; defaultValue = "" }, navArgument("index") { type = NavType.IntType; defaultValue = -1 }),
+    ) { RuleEditorScreen(onBack = back) }
     composable(Routes.PARSER_TEST) { ParserTestScreen(onBack = back) }
 
     composable(Routes.BILLS) { BillsScreen(onBack = back, onEdit = { nav.navigate(Routes.billEdit(it)) }) }

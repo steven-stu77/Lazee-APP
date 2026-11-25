@@ -29,6 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -154,4 +156,41 @@ fun PhotoMenu(hasPhoto: Boolean, onCamera: () -> Unit, onGallery: () -> Unit, on
         },
         confirmButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
+}
+
+/** Pick when it happened: quick days plus any date and any time. */
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+fun DateTimeDialog(date: LocalDate, time: java.time.LocalTime, onDate: (LocalDate) -> Unit, onTime: (java.time.LocalTime) -> Unit, onDismiss: () -> Unit) {
+    var pickDate by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var pickTime by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val today = LocalDate.now()
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.add_when)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(R.string.today to today, R.string.yesterday to today.minusDays(1), R.string.day_before to today.minusDays(2)).forEach { (label, d) ->
+                        Chip(stringResource(label), date == d, onClick = { onDate(d) })
+                    }
+                }
+                MenuItem(stringResource(R.string.add_pick_date) + "  ·  " + io.github.steven_stu77.lazee.core.ui.Labels.dayFull(ctx, date)) { pickDate = true }
+                MenuItem(stringResource(R.string.add_pick_time) + "  ·  " + time.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"))) { pickTime = true }
+                MenuItem(stringResource(R.string.add_now)) { onDate(today); onTime(java.time.LocalTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES)) }
+            }
+        },
+        confirmButton = { TextButton(onDismiss) { Text(stringResource(R.string.ok)) } },
+    )
+    if (pickDate) DatePickDialog(date, { onDate(it); pickDate = false }, { pickDate = false })
+    if (pickTime) {
+        val st = androidx.compose.material3.rememberTimePickerState(time.hour, time.minute, is24Hour = true)
+        AlertDialog(
+            onDismissRequest = { pickTime = false },
+            text = { androidx.compose.material3.TimePicker(st) },
+            confirmButton = { TextButton({ onTime(java.time.LocalTime.of(st.hour, st.minute)); pickTime = false }) { Text(stringResource(R.string.ok)) } },
+            dismissButton = { TextButton({ pickTime = false }) { Text(stringResource(R.string.cancel)) } },
+        )
+    }
 }

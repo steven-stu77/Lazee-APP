@@ -3,10 +3,8 @@ package io.github.steven_stu77.lazee.feature.add
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,6 +53,7 @@ import io.github.steven_stu77.lazee.core.ui.theme.Base
 import io.github.steven_stu77.lazee.core.ui.theme.LocalPalette
 import io.github.steven_stu77.lazee.core.ui.theme.Type
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 /** 记一笔 (spec §5.3). [newCategoryId] is set when the new-category page returns. */
 @Composable
@@ -84,7 +83,7 @@ fun AddScreen(
 
     Column(Modifier.fillMaxSize().background(Base.card).navigationBarsPadding()) {
         Header(s.type, onClose, vm::setType)
-        AmountRow(s, onTap = vm::cycleDate, onLongPress = { showDatePicker = true })
+        AmountRow(s, onTap = { showDatePicker = true })
         Column(Modifier.weight(1f).padding(horizontal = 16.dp)) {
             if (s.templates.isNotEmpty()) TemplateRow(s, vm)
             if (s.type == TxnType.TRANSFER) TransferPicker(s, vm, Modifier.weight(1f))
@@ -99,7 +98,7 @@ fun AddScreen(
         }
     }
 
-    if (showDatePicker) DatePickDialog(s.date, onPick = { vm.setDate(it); showDatePicker = false }, onDismiss = { showDatePicker = false })
+    if (showDatePicker) DateTimeDialog(s.date, s.time, onDate = vm::setDate, onTime = vm::setTime, onDismiss = { showDatePicker = false })
     if (showPhotoMenu) PhotoMenu(
         hasPhoto = s.photo != null,
         onCamera = { showPhotoMenu = false; vm.cameraUri().also { cameraUri = it; takePhoto.launch(it) } },
@@ -127,9 +126,8 @@ private fun Header(type: TxnType, onClose: () -> Unit, onType: (TxnType) -> Unit
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun AmountRow(s: AddUiState, onTap: () -> Unit, onLongPress: () -> Unit) {
+private fun AmountRow(s: AddUiState, onTap: () -> Unit) {
     val context = LocalContext.current
     val today = LocalDate.now()
     val dayLabel = when (s.date) {
@@ -141,12 +139,12 @@ private fun AmountRow(s: AddUiState, onTap: () -> Unit, onLongPress: () -> Unit)
     Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(
             Modifier.height(36.dp).clip(RoundedCornerShape(18.dp)).background(Base.page)
-                .combinedClickable(role = Role.Button, onClickLabel = stringResource(R.string.add_date_hint), onClick = onTap, onLongClick = onLongPress)
+                .clickable(role = Role.Button, onClickLabel = stringResource(R.string.add_date_hint), onClick = onTap)
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Icon(LazeeIcons.Calendar, null, tint = Base.text, modifier = Modifier.size(16.dp))
-            Text(dayLabel, style = Type.small.copy(color = Base.text))
+            Text("$dayLabel ${s.time.format(DateTimeFormatter.ofPattern("HH:mm"))}", style = Type.small.copy(color = Base.text))
         }
         Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
             if (s.calc.isPending) Text(s.calc.expr.replace("+", " + ").replace("−", " − ").replace("×", " × ").replace("÷", " ÷ "), style = Type.small, maxLines = 1, overflow = TextOverflow.Ellipsis)
